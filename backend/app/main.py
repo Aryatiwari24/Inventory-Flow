@@ -24,10 +24,16 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Configure CORS Middleware
+# Configure CORS whitelisted origins (Production Vercel + Localhost)
+origins = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "https://inventory-flow-zs2o.vercel.app",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all for docker containers, restrict in prod
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
