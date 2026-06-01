@@ -29,6 +29,7 @@ origins = [
     "http://localhost:3000",
     "http://localhost:5173",
     "https://inventory-flow-zs2o.vercel.app",
+    "https://inventory-flow-zs2o.vercel.app/",
 ]
 
 app.add_middleware(

@@ -1,12 +1,20 @@
 from typing import List, Optional
 from uuid import UUID
 from fastapi import APIRouter, Depends, Query, status
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database.session import get_db
 from app.schemas import products as schemas
 from app.services.product_service import ProductService
 
 router = APIRouter(prefix="/products", tags=["Products"])
+
+class ProductListResponse(BaseModel):
+    success: bool
+    total: int
+    page: int
+    limit: int
+    data: List[schemas.Product]
 
 @router.post("/", response_model=schemas.Product, status_code=status.HTTP_201_CREATED)
 async def create_product(
@@ -16,7 +24,7 @@ async def create_product(
     return await ProductService.create_product(db, product_in)
 
 
-@router.get("/", response_model=dict)
+@router.get("/", response_model=ProductListResponse)
 async def list_products(
     search: Optional[str] = Query(None, description="Search term for name/SKU/category"),
     category: Optional[str] = Query(None, description="Filter products by category"),

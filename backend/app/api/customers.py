@@ -1,12 +1,21 @@
-from typing import Optional
+from typing import List, Optional
 from uuid import UUID
 from fastapi import APIRouter, Depends, Query, status
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database.session import get_db
 from app.schemas import customers as schemas
 from app.services.customer_service import CustomerService
 
 router = APIRouter(prefix="/customers", tags=["Customers"])
+
+class CustomerListResponse(BaseModel):
+    success: bool
+    total: int
+    page: int
+    limit: int
+    data: List[schemas.Customer]
+
 
 @router.post("/", response_model=schemas.Customer, status_code=status.HTTP_201_CREATED)
 async def create_customer(
@@ -16,7 +25,7 @@ async def create_customer(
     return await CustomerService.create_customer(db, customer_in)
 
 
-@router.get("/", response_model=dict)
+@router.get("/", response_model=CustomerListResponse)
 async def list_customers(
     search: Optional[str] = Query(None, description="Search term for name, email, or phone"),
     page: int = Query(1, ge=1, description="Page number"),
