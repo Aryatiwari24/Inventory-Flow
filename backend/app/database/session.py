@@ -2,10 +2,19 @@ import os
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import declarative_base
 
-# Smart Fallback: Use SQLite locally outside Docker, use PostgreSQL inside Docker
+# Smart Fallback & Scheme Adaptation
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-if not DATABASE_URL or "@postgres" in DATABASE_URL:
+if not DATABASE_URL:
+    # Render Production PostgreSQL internal URI (automatically formatted for asyncpg)
+    DATABASE_URL = "postgresql+asyncpg://inventory_user:KeuStKHvNriUASNpsuSrEZ1OH2zv9vqY@dpg-d8et8td7vvec73dveq3g-a/inventory_km3p"
+
+# If the URL starts with raw postgresql://, adapt it for asyncpg
+if DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+
+# Safely fallback to SQLite locally if we cannot reach the internal Docker or Render hostnames
+if "@postgres" in DATABASE_URL or ("@dpg-" in DATABASE_URL and os.name == 'nt' and not os.getenv("RENDER")):
     DATABASE_URL = "sqlite+aiosqlite:///./inventoryflow.db"
 
 # Create an async database engine (works seamlessly for both PostgreSQL and SQLite)
