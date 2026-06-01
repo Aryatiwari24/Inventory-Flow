@@ -2,7 +2,7 @@
 // Includes a premium, high-fidelity LocalStorage Database Simulator fallback
 // which automatically takes over if the backend API server is offline!
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://inventoryflow-backend-c4lk.onrender.com/api';
 let useLocalMock = false;
 
 // Initialize high-fidelity Local Storage database if offline fallback is triggered
